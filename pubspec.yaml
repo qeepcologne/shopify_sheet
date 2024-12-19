@@ -1,7 +1,7 @@
 name: shopify_sheet
-description: "A new Flutter project."
-version: 0.0.1
-homepage:
+description: "Flutter Shopify Checkout Sheet Plugin"
+version: 0.0.2
+homepage: https://github.com/farooq958/shopify_sheet
 
 environment:
   sdk: ^3.5.3

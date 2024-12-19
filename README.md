@@ -16,7 +16,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  shopify_sheet: ^0.0.1
+  shopify_sheet: ^0.0.2
 ```
 
 Run the following command to get the package:
@@ -103,10 +103,11 @@ android {
 ```
 
 ---
+### **3. iOS Configuration**
+make sure the project dependency is greater than or equal to `13.0`
+### **4. Usage**
 
-### **3. Usage**
-
-#### **3.1 Launch Shopify Checkout**
+#### **4.1 Launch Shopify Checkout**
 
 Here’s how to launch the Shopify Checkout Sheet and listen for events:
 
@@ -150,6 +151,9 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
           break;
         case ShopifySheetEventType.failed:
           print("Checkout Failed: ${event.error}");
+          break;
+        case ShopifySheetEventType.pixelEvent:
+          print("Pixel Event: ${event.data}");
           break;
         case ShopifySheetEventType.unknown:
         default:
