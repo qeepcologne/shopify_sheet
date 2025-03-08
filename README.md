@@ -147,7 +147,7 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
           print("Checkout Completed");
           break;
         case ShopifySheetEventType.canceled:
-          _shopifySheet.closeCheckout(); /// close checkout programmatically
+          _shopifySheet.closeCheckout(); // close checkout programmatically
           print("Checkout Canceled");
           break;
         case ShopifySheetEventType.failed:
