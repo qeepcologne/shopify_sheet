@@ -4,3 +4,7 @@
 ## 0.0.2
 
 * iOS Support added using Shopify iOS checkout sdk version 3.1.2
+
+## 0.0.3
+
+* Programmatically close checkout added

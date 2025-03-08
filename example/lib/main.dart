@@ -34,6 +34,7 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
           break;
         case ShopifySheetEventType.canceled:
           print("Checkout Canceled");
+          _shopifySheet.closeCheckout();
           break;
         case ShopifySheetEventType.failed:
           print("Checkout Failed: ${event.error}");
@@ -50,6 +51,7 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
   }
 
   void _launchCheckout() {
+
     _shopifySheet.launchCheckout(
         'https://modish-2-0.myshopify.com/cart/c/Z2NwLWFzaWEtc291dGhlYXN0MTowMUpGOU0xRUtQSjhTWk1aMjY2VlZZWUZTMA?key=7877f0ef27e2a7006c63da8096ea7d58'
     );
