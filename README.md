@@ -16,7 +16,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  shopify_sheet: ^0.0.2
+  shopify_sheet: ^0.0.4
 ```
 
 Run the following command to get the package:
@@ -147,6 +147,7 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
           print("Checkout Completed");
           break;
         case ShopifySheetEventType.canceled:
+          _shopifySheet.closeCheckout(); /// close checkout programmatically
           print("Checkout Canceled");
           break;
         case ShopifySheetEventType.failed:

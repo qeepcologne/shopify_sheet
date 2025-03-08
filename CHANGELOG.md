@@ -8,3 +8,7 @@
 ## 0.0.3
 
 * Programmatically close checkout added
+
+## 0.0.4 
+
+* Readme Updated
