@@ -17,8 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  shopify_sheet:
-    path: ../
+  shopify_sheet: ^0.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

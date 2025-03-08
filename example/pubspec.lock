@@ -189,10 +189,11 @@ packages:
   shopify_sheet:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
-    version: "0.0.1"
+      name: shopify_sheet
+      sha256: "219fc835d3799c99721e2651d06c06231da1f68f8b7a18b23177316fbd474aa8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   sky_engine:
     dependency: transitive
     description: flutter
