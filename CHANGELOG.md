@@ -12,3 +12,7 @@
 ## 0.0.4 
 
 * Readme Updated
+
+## 0.0.4 
+
+* update checkout-sheet-kit-android 3.5.0 + dependencies
