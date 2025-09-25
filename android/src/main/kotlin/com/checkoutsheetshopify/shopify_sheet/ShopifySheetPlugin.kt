@@ -69,9 +69,9 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
         val currentActivity = activity
         if (currentActivity is androidx.activity.ComponentActivity) {
             try {
-		ShopifyCheckoutSheetKit.configure {
+		/*ShopifyCheckoutSheetKit.configure {
 		    it.logLevel = LogLevel.DEBUG
-		}
+		}*/
                 checkoutSheet = ShopifyCheckoutSheetKit.present(checkoutUrl,
                     currentActivity,
                     object : DefaultCheckoutEventProcessor(currentActivity) {
