@@ -1,3 +1,5 @@
+import com.shopify.checkoutsheet.PixelEvent
+
 package com.checkoutsheetshopify.shopify_sheet
 
 import android.app.Activity
@@ -20,6 +22,7 @@ import android.util.Log
 import com.shopify.checkoutsheetkit.CheckoutSheetKitDialog
 import com.shopify.checkoutsheetkit.LogLevel
 import com.shopify.checkoutsheetkit.Preloading
+import com.shopify.checkoutsheetkit.pixelevents.PixelEvent
 
 /** ShopifySheetPlugin */
 class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
