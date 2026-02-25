@@ -1,5 +1,3 @@
-import com.shopify.checkoutsheet.PixelEvent
-
 package com.checkoutsheetshopify.shopify_sheet
 
 import android.app.Activity
