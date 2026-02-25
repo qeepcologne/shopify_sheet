@@ -115,6 +115,16 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
                                 )
                             )
                         }
+
+			override fun onWebPixelEvent(event: PixelEvent) {
+			    eventSink?.success(
+			        mapOf(
+			            "event" to "pixel_event",
+			            "error" to null,
+			            "data" to event.jsonPayload
+			        )
+			    )
+			}
                     })
                 result.success("Checkout Launched")
             } catch (e: Exception) {
