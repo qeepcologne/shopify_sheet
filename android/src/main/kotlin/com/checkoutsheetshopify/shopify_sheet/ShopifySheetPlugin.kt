@@ -122,7 +122,7 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
 			        mapOf(
 			            "event" to "pixel_event",
 			            "error" to null,
-			            "data" to event.jsonPayload
+			            "data" to event.data
 			        )
 			    )
 			}
