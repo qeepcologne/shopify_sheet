@@ -22,6 +22,7 @@ import com.shopify.checkoutsheetkit.LogLevel
 import com.shopify.checkoutsheetkit.Preloading
 import com.shopify.checkoutsheetkit.pixelevents.PixelEvent
 import com.shopify.checkoutsheetkit.pixelevents.StandardPixelEvent
+import com.shopify.checkoutsheetkit.pixelevents.CustomPixelEvent
 
 /** ShopifySheetPlugin */
 class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
