@@ -23,6 +23,8 @@ import com.shopify.checkoutsheetkit.Preloading
 import com.shopify.checkoutsheetkit.pixelevents.PixelEvent
 import com.shopify.checkoutsheetkit.pixelevents.StandardPixelEvent
 import com.shopify.checkoutsheetkit.pixelevents.CustomPixelEvent
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken    
 
 /** ShopifySheetPlugin */
 class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
@@ -120,11 +122,19 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
                         }
 
 			override fun onWebPixelEvent(event: PixelEvent) {
-                val pixelData = if (event is StandardPixelEvent) {
-                    event.data // This is already an object/map in the Shopify SDK
-                } else if (event is CustomPixelEvent) {
-                    event.customData
-                } else {
+                val gson = Gson()
+
+                val rawData = when (event) {
+                    is StandardPixelEvent -> event.data
+                    is CustomPixelEvent -> event.customData
+                    else -> null
+                }
+
+                val dataMap: Map<String, Any>? = try {
+                    val jsonString = gson.toJson(rawData)
+                    val type = object : TypeToken<Map<String, Any>>() {}.type
+                    gson.fromJson(jsonString, type)
+                } catch (e: Exception) {
                     null
                 }
 
@@ -132,7 +142,7 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
 			        mapOf(
 			            "event" to "pixel_event",
 			            "error" to null,
-				    "data" to pixelData
+				    "data" to dataMap
 			        )
 			    )
 			}
