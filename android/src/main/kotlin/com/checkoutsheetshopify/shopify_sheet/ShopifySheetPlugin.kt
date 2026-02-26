@@ -121,31 +121,31 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
                             )
                         }
 
-			override fun onWebPixelEvent(event: PixelEvent) {
-                val gson = Gson()
+                        override fun onWebPixelEvent(event: PixelEvent) {
+                            val gson = Gson()
 
-                val rawData = when (event) {
-                    is StandardPixelEvent -> event.data
-                    is CustomPixelEvent -> event.customData
-                    else -> null
-                }
+                            val rawData = when (event) {
+                                is StandardPixelEvent -> event.data
+                                is CustomPixelEvent -> event.customData
+                                else -> null
+                            }
 
-                val dataMap: Map<String, Any>? = try {
-                    val jsonString = gson.toJson(rawData)
-                    val type = object : TypeToken<Map<String, Any>>() {}.type
-                    gson.fromJson(jsonString, type)
-                } catch (e: Exception) {
-                    null
-                }
+                            val dataMap: Map<String, Any>? = try {
+                                val jsonString = gson.toJson(rawData)
+                                val type = object : TypeToken<Map<String, Any>>() {}.type
+                                gson.fromJson(jsonString, type)
+                            } catch (e: Exception) {
+                                null
+                            }
 
-			    eventSink?.success(
-			        mapOf(
-			            "event" to "pixel_event",
-			            "error" to null,
-				    "data" to dataMap
-			        )
-			    )
-			}
+                            eventSink?.success(
+                                mapOf(
+                                    "event" to "pixel_event",
+                                    "error" to null,
+                                    "data" to dataMap
+                                )
+                            )
+                        }
                     })
                 result.success("Checkout Launched")
             } catch (e: Exception) {
@@ -187,13 +187,10 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
                 // Only set colors if we're using Web or Automatic with overrides
 
 
-
-
-
                 // Preloading configuration
                 configMap["preload"]?.let { preload ->
 
-                    config.preloading =  Preloading(enabled = preload as Boolean)
+                    config.preloading = Preloading(enabled = preload as Boolean)
 
                 }
 
