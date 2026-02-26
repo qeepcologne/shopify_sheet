@@ -119,11 +119,19 @@ class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activ
                         }
 
 			override fun onWebPixelEvent(event: PixelEvent) {
+                val pixelData = if (event is StandardPixelEvent) {
+                    event.data // This is already an object/map in the Shopify SDK
+                } else if (event is CustomPixelEvent) {
+                    event.customData
+                } else {
+                    null
+                }
+
 			    eventSink?.success(
 			        mapOf(
 			            "event" to "pixel_event",
 			            "error" to null,
-				    "data" to (event as? StandardPixelEvent)?.data?.toString()
+				    "data" to pixelData
 			        )
 			    )
 			}
