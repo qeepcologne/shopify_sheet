@@ -24,7 +24,7 @@ import com.shopify.checkoutsheetkit.pixelevents.PixelEvent
 import com.shopify.checkoutsheetkit.pixelevents.StandardPixelEvent
 import com.shopify.checkoutsheetkit.pixelevents.CustomPixelEvent
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken    
+import com.google.gson.reflect.TypeToken
 
 /** ShopifySheetPlugin */
 class ShopifySheetPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
