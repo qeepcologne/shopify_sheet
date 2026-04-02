@@ -21,3 +21,6 @@
 
 ## 0.1.0
 * implement android pixel events
+
+## 0.1.1
+* swift package manager support
