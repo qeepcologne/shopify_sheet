@@ -24,4 +24,4 @@
 
 ## 0.1.1
 * swift package manager support
-* update checkout-sheet-kit-android 3.5.4
+<!-- TODO: update checkout-sheet-kit-android to 3.5.4 once published to Maven Central -->

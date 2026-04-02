@@ -17,7 +17,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -50,7 +49,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.Shopify.checkout-sheet-kit-android:lib:3.5.4'
+        implementation 'com.shopify:checkout-sheet-kit:3.5.3'
         implementation 'androidx.appcompat:appcompat:1.7.1'
         implementation 'androidx.activity:activity:1.12.4'
         implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.10.0'
