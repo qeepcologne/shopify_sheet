@@ -24,3 +24,4 @@
 
 ## 0.1.1
 * swift package manager support
+* update checkout-sheet-kit-android 3.5.4
