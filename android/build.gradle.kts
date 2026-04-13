@@ -30,13 +30,13 @@ android {
     }
 
     dependencies {
-        implementation("com.shopify:checkout-sheet-kit:3.5.3")
+        implementation("com.shopify:checkout-sheet-kit:3.5.4")
         implementation("androidx.appcompat:appcompat:1.7.1")
-        implementation("androidx.activity:activity:1.12.4")
+        implementation("androidx.activity:activity:1.13.0")
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
         implementation("com.google.code.gson:gson:2.13.2")
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.21.0")
+        testImplementation("org.mockito:mockito-core:5.23.0")
     }
 
     testOptions {

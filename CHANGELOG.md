@@ -22,6 +22,8 @@
 ## 0.1.0
 * implement android pixel events
 
+## 0.1.2
+* android: bump checkout-sheet-kit 3.5.3 → 3.5.4, androidx.activity 1.12.4 → 1.13.0, mockito-core 5.21.0 → 5.23.0
+
 ## 0.1.1
 * swift package manager support
-<!-- TODO: update checkout-sheet-kit-android to 3.5.4 once published to Maven Central -->
