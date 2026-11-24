@@ -1,6 +1,6 @@
 # Shopify Sheet Flutter Plugin
 
-The **Shopify Sheet Flutter Plugin** is a powerful tool to seamlessly integrate the Shopify Checkout Sheet SDK into your Flutter app. This plugin provides a clean and simple API to launch the Shopify Checkout Sheet and handle events like completion, cancellation, and errors.
+The **Shopify Sheet Flutter Plugin** is a powerful tool to seamlessly integrate Shopify [Checkout Kit](https://github.com/Shopify/checkout-kit) 4 into your Flutter app. This plugin provides a clean and simple API to launch the Shopify Checkout Sheet and handle events like completion, cancellation, and errors.
 
 ## Features
 - Launch the Shopify Checkout Sheet from your Flutter app.
@@ -16,7 +16,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  shopify_sheet: ^0.1.2
+  shopify_sheet: ^1.0.0
 ```
 
 Run the following command to get the package:
@@ -104,7 +104,7 @@ android {
 
 ---
 ### **3. iOS Configuration**
-make sure the project dependency is greater than or equal to `13.0`
+Set the iOS deployment target to at least `15.0`. Checkout Kit 4 is resolved through Swift Package Manager; its 4.0.0 release is not published to CocoaPods trunk.
 ### **4. Usage**
 
 #### **4.1 Launch Shopify Checkout**
@@ -144,17 +144,15 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
     _shopifySheet.checkoutEvents.listen((event) {
       switch (event.type) {
         case ShopifySheetEventType.completed:
-          print("Checkout Completed");
+          // event.data is the checkout: totals, currency, order id, line items, ...
+          print("Checkout Completed: ${event.data?['order']}");
           break;
         case ShopifySheetEventType.canceled:
           _shopifySheet.closeCheckout(); // close checkout programmatically
           print("Checkout Canceled");
           break;
         case ShopifySheetEventType.failed:
-          print("Checkout Failed: ${event.error}");
-          break;
-        case ShopifySheetEventType.pixelEvent:
-          print("Pixel Event: ${event.data}");
+          print("Checkout Failed: ${event.errorCode} ${event.error}");
           break;
         case ShopifySheetEventType.unknown:
         default:
@@ -183,6 +181,15 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
   }
 }
 ```
+
+
+### **5. Migrating from 0.x**
+1.0.0 moves from Checkout Sheet Kit 3 to Checkout Kit 4 on both platforms:
+- `ShopifySheetEventType.pixelEvent` is gone: Checkout Kit 4 no longer emits web pixel events. `completed` carries the checkout instead (`event.data`, in the Embedded Checkout Protocol shape: `totals` with amounts in minor units, `currency`, `order.id`, ...), the same on Android and iOS.
+- `failed` events carry a machine-readable `errorCode` next to the message.
+- `canceled` is still sent when the sheet closes, also after a `failed` checkout.
+- `title`, the colors and `closeButtonTintColor` now apply on Android too.
+- minimum iOS 15.
 
 ---
 

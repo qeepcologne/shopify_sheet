@@ -4,19 +4,19 @@ import PackageDescription
 let package = Package(
     name: "shopify_sheet",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v15),
     ],
     products: [
         .library(name: "shopify-sheet", targets: ["shopify_sheet"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Shopify/checkout-sheet-kit-swift", from: "3.0.0"),
+        .package(url: "https://github.com/Shopify/checkout-kit", from: "4.0.0"),
     ],
     targets: [
         .target(
             name: "shopify_sheet",
             dependencies: [
-                .product(name: "ShopifyCheckoutSheetKit", package: "checkout-sheet-kit-swift"),
+                .product(name: "ShopifyCheckoutKit", package: "checkout-kit"),
             ],
             path: "Sources/shopify_sheet",
             resources: [

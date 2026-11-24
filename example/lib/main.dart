@@ -39,10 +39,7 @@ class _ShopifyCheckoutDemoState extends State<ShopifyCheckoutDemo> {
           _shopifySheet.closeCheckout();
           break;
         case ShopifySheetEventType.failed:
-          print("Checkout Failed: ${event.error}");
-          break;
-          case ShopifySheetEventType.pixelEvent:
-          print("Pixel Event: ${event.data}");
+          print("Checkout Failed: ${event.errorCode} ${event.error}");
           break;
         case ShopifySheetEventType.unknown:
         print("Unknown Event: ${event.error}");

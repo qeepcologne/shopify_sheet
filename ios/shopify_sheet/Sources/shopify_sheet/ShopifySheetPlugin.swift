@@ -1,10 +1,11 @@
 import Flutter
 import UIKit
-import ShopifyCheckoutSheetKit
+import ShopifyCheckoutKit
 
 public class ShopifySheetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
-    private var eventSink: FlutterEventSink?
+    fileprivate var eventSink: FlutterEventSink?
     private var checkoutViewController: UIViewController?
+    private var checkoutDelegate: CheckoutEvents?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "shopify_sheet", binaryMessenger: registrar.messenger())
@@ -23,7 +24,7 @@ public class ShopifySheetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                 result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid or missing arguments", details: nil))
                 return
             }
-            let config = args["config"] as? [String: Any]
+            let config = args["config"] as? [String: Any] ?? [:]
             presentCheckout(url: checkoutUrl, config: config, result: result)
         case "closeCheckout":
             closeCheckout(result: result)
@@ -42,81 +43,63 @@ public class ShopifySheetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         return nil
     }
 
-    private func presentCheckout(url: String, config: [String: Any]?, result: @escaping FlutterResult) {
+    private func presentCheckout(url: String, config: [String: Any], result: @escaping FlutterResult) {
         guard let checkoutURL = URL(string: url) else {
             result(FlutterError(code: "INVALID_URL", message: "Invalid Checkout URL", details: nil))
             return
         }
 
-        // Apply configuration if provided
-        if let config = config {
-            applyConfiguration(config)
-        }
-
-        DispatchQueue.main.async {
-            guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else {
+        Task { @MainActor in
+            guard let rootViewController = UIApplication.shared.connectedScenes
+                .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
+                .first?.rootViewController else {
                 result(FlutterError(code: "INVALID_CONTEXT", message: "No valid root view controller", details: nil))
                 return
             }
 
-            self.checkoutViewController = ShopifyCheckoutSheetKit.present(
+            Self.applyConfiguration(config)
+            //the sdk holds its delegate weakly
+            let delegate = CheckoutEvents(plugin: self)
+            self.checkoutDelegate = delegate
+            self.checkoutViewController = ShopifyCheckout.present(
                 checkout: checkoutURL,
                 from: rootViewController,
-                delegate: self
+                delegate: delegate
             )
             result("Checkout Launched")
         }
     }
 
-    private func applyConfiguration(_ configMap: [String: Any]) {
+    @MainActor
+    private static func applyConfiguration(_ config: [String: Any]) {
+        ShopifyCheckout.configure { configuration in
+            let customize: (inout CheckoutColors) -> Void = { colors in
+                if let color = hexToUIColor(config["titleBarBackgroundColor"]) { colors.headerBackgroundColor = color }
+                if let color = hexToUIColor(config["backgroundColor"]) { colors.webViewBackgroundColor = color }
+                if let color = hexToUIColor(config["tintColor"]) { colors.progressIndicatorColor = color }
+                if let color = hexToUIColor(config["closeButtonTintColor"]) { colors.closeIconTintColor = color }
+            }
 
-        // Color scheme
-        if let scheme = configMap["colorScheme"] as? String {
-            switch scheme {
-            case "light":
-                ShopifyCheckoutSheetKit.configuration.colorScheme = .light
-            case "dark":
-                ShopifyCheckoutSheetKit.configuration.colorScheme = .dark
+            switch config["colorScheme"] as? String {
             case "web":
-                ShopifyCheckoutSheetKit.configuration.colorScheme = .web
+                var colors = CheckoutColors()
+                customize(&colors)
+                configuration.appearance = .storefront(colors: colors)
+            case "light":
+                configuration.appearance = .app(CheckoutColorScheme.light().customize(customize))
+            case "dark":
+                configuration.appearance = .app(CheckoutColorScheme.dark().customize(customize))
             default:
-                ShopifyCheckoutSheetKit.configuration.colorScheme = .automatic
+                configuration.appearance = .app(CheckoutColorScheme.automatic().customize(customize))
+            }
+
+            if let title = config["title"] as? String {
+                configuration.title = title
+            }
+            if let preload = config["preload"] as? Bool {
+                configuration.preloading.enabled = preload
             }
         }
-        
-
-        if let title = configMap["title"] as? String {
-            ShopifyCheckoutSheetKit.configuration.title = title
-        }
-
-        // Tint color
-        if let tintColor = configMap["tintColor"] as? String,
-           let color = hexToUIColor(hex: tintColor) {
-            ShopifyCheckoutSheetKit.configuration.tintColor = color
-        }
-
-        // Close button tint
-        if let closeButtonTintColor = configMap["closeButtonTintColor"] as? String,
-           let color = hexToUIColor(hex: closeButtonTintColor) {
-            ShopifyCheckoutSheetKit.configuration.closeButtonTintColor = color
-        }
-    }
-
-
-    private func hexToUIColor(hex: String) -> UIColor? {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-
-        var rgb: UInt64 = 0
-        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else {
-            return nil
-        }
-
-        let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
-        let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
-        let blue = CGFloat(rgb & 0x0000FF) / 255.0
-
-        return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
     }
 
     private func closeCheckout(result: @escaping FlutterResult) {
@@ -131,73 +114,62 @@ public class ShopifySheetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             }
         }
     }
+
+    fileprivate func checkoutDidDismiss() {
+        checkoutViewController = nil
+    }
 }
 
-extension ShopifySheetPlugin: CheckoutDelegate {
-    public func checkoutDidComplete(event: CheckoutCompletedEvent) {
+/// `CheckoutDelegate` is main-actor isolated, so the conformance lives on its own main-actor type instead of the plugin.
+@MainActor
+private final class CheckoutEvents: CheckoutDelegate {
+    private weak var plugin: ShopifySheetPlugin?
+
+    init(plugin: ShopifySheetPlugin) {
+        self.plugin = plugin
+    }
+
+    func checkoutDidComplete(_ event: CheckoutCompleteEvent) {
+        var payload: [String: Any] = ["event": "completed"]
         do {
-            let eventData = try encodeCheckoutCompletedEvent(event: event)
-            self.eventSink?(["event": "completed", "data": eventData])
+            let json = try JSONEncoder().encode(event.checkout)
+            payload["checkout"] = String(data: json, encoding: .utf8)
         } catch {
-            self.eventSink?(["event": "completed", "error": "Failed to serialize checkout data"])
+            NSLog("ShopifySheetPlugin: error serializing checkout: \(error)")
         }
+        plugin?.eventSink?(payload)
     }
 
-    public func checkoutDidCancel() {
-        self.eventSink?(["event": "canceled"])
+    /// The buyer closed the sheet, or the SDK closed it after a terminal failure (reported through `checkoutDidFail` first),
+    /// reported as `canceled`, the event name this plugin has always used for it.
+    func checkoutDidDismiss() {
+        plugin?.checkoutDidDismiss()
+        plugin?.eventSink?(["event": "canceled"])
     }
 
-    public func checkoutDidFail(error: ShopifyCheckoutSheetKit.CheckoutError) {
-        self.eventSink?(["event": "failed", "error": error.localizedDescription])
-    }
-
-    public func checkoutDidEmitWebPixelEvent(event: ShopifyCheckoutSheetKit.PixelEvent) {
-        var eventData: [String: Any] = [:]
-
-        switch event {
-        case .customEvent(let customEvent):
-            eventData = [
-                "type": "custom",
-                "id": customEvent.id ?? "",
-                "name": customEvent.name ?? "",
-                "timestamp": customEvent.timestamp ?? "",
-                "customData": customEvent.customData ?? "",
-            ]
-        case .standardEvent(let standardEvent):
-            eventData = [
-                "type": "standard",
-                "id": standardEvent.id ?? "",
-                "name": standardEvent.name ?? "",
-                "timestamp": standardEvent.timestamp ?? "",
-                "data": standardEvent.data != nil ? encodeStandardEventData(standardEvent.data!) : [:],
-            ]
-        }
-
-        self.eventSink?(["event": "pixel_event", "data": eventData])
+    func checkoutDidFail(_ event: CheckoutFailureEvent) {
+        plugin?.eventSink?([
+            "event": "failed",
+            "error": event.error.message,
+            "errorCode": event.error.code.rawValue,
+        ])
     }
 }
 
-// Helper functions
-private func encodeStandardEventData(_ data: ShopifyCheckoutSheetKit.StandardEventData) -> [String: Any] {
-    do {
-        let jsonData = try JSONEncoder().encode(data)
-        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
-        if let dictionary = jsonObject as? [String: Any] {
-            return dictionary
-        }
-    } catch {
-        print("Error serializing StandardEventData: \(error)")
+private func hexToUIColor(_ value: Any?) -> UIColor? {
+    guard let hex = value as? String else {
+        return nil
     }
-    return [:]
-}
+    let hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "#", with: "")
 
-private func encodeCheckoutCompletedEvent(event: CheckoutCompletedEvent) throws -> [String: Any] {
-    let jsonData = try JSONEncoder().encode(event)
-    let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
-
-    guard let dictionary = jsonObject as? [String: Any] else {
-        throw NSError(domain: "SerializationError", code: -1, userInfo: nil)
+    var rgb: UInt64 = 0
+    guard hexSanitized.count == 6, Scanner(string: hexSanitized).scanHexInt64(&rgb) else {
+        return nil
     }
 
-    return dictionary
+    let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+    let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+    let blue = CGFloat(rgb & 0x0000FF) / 255.0
+
+    return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
 }

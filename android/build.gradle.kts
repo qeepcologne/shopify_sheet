@@ -30,11 +30,11 @@ android {
     }
 
     dependencies {
-        implementation("com.shopify:checkout-sheet-kit:3.5.4")
+        implementation("com.shopify:checkout-kit:4.0.0")
+        //the checkout model is serialized for dart with its own serializer; checkout-kit has this only at runtime
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
         implementation("androidx.appcompat:appcompat:1.7.1")
         implementation("androidx.activity:activity:1.13.0")
-        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-        implementation("com.google.code.gson:gson:2.13.2")
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.23.0")
     }

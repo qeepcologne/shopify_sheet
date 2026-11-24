@@ -27,3 +27,10 @@
 
 ## 0.1.2
 * android: update checkout-sheet-kit 3.5.4 + dependencies
+
+## 1.0.0
+* Checkout Kit 4 (`com.shopify:checkout-kit` 4.0.0, `Shopify/checkout-kit` 4.0.0) replaces Checkout Sheet Kit 3 on Android and iOS
+* BREAKING: `ShopifySheetEventType.pixelEvent` removed, Checkout Kit 4 no longer emits web pixel events; `completed` carries the checkout as `data` on both platforms
+* `failed` events carry an `errorCode`
+* Android: `title`, colors and `closeButtonTintColor` are applied
+* iOS: minimum iOS 15; the plugin sources exist once, shared by Swift Package Manager and CocoaPods
